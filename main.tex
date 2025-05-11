@@ -19,27 +19,6 @@
 
 \newpage
 \pagenumbering{gobble}
-\renewcommand*\contentsname{TABLE OF CONTENTS}
-\titlecontents{chapter}
-    [0.0cm]             % left margin
-    {\bfseries\vspace{0.3cm}}                  % above code
-    {{\bfseries{\scshape} CHAPTER \thecontentslabel.\ }} % numbered format
-    {}         % unnumbered format
-    {\titlerule*[0.3pc]{.}\contentspage}         % filler-page-format, e.g dots
-    
-\titlecontents{section}
-    [0.0cm]             % left margin
-    {\vspace{0.3cm}}                  % above code
-    {\thecontentslabel \ } % numbered format
-    {}         % unnumbered format
-    {\titlerule*[0.3pc]{.}\contentspage}         % filler-page-format, e.g dots
-    
-\titlecontents{subsection}
-    [1.0cm]             % left margin
-    {\vspace{0.3cm}}                  % above code
-    {\thecontentslabel \ } % numbered format
-    {}         % unnumbered format
-    {\titlerule*[0.3pc]{.}\contentspage}         % filler-page-format, e.g dots
 
 \addtocontents{toc}{\protect\thispagestyle{empty}}
 \tableofcontents 
@@ -73,14 +52,15 @@
 \renewcommand{\chaptername}{CHAPTER}
 
 \newpage
-\chapter{INTRODUCTION}
-\input{content/1_introduction.tex}
-
 \pagenumbering{arabic}
 \pagestyle{fancy}
 \fancyhf{}
 \fancyhead[RE, LO]{\leftmark}
 \fancyfoot[RE, LO]{\thepage}
+
+\chapter{INTRODUCTION}
+\input{content/1_introduction.tex}
+
 
 
 \newpage

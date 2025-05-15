@@ -36,17 +36,18 @@
 \usepackage{listings}
 \usepackage{subcaption}
 
-\usepackage[nonumberlist, nopostdot, nogroupskip, acronym]{glossaries}
+\usepackage[nonumberlist, nopostdot, nogroupskip, acronym]{glossaries-extra}
 \usepackage{glossary-superragged}
 \setglossarystyle{superraggedheaderborder}
-\usepackage{setspace}
+\input{glossary.tex}
 
+\usepackage{setspace}
 \usepackage{blindtext}
 
 \usepackage{csquotes}
-\usepackage[backend=biber,style=ieee]{biblatex}
+\usepackage[backend=biber,style=ieee,sorting=ynt]{biblatex}
+\addbibresource{references.bib}
 
-\addbibresource{reference.bib}
 
 \def \TITLE{GRADUATION THESIS}
 \def \AUTHOR{Nguyễn Trí Nghĩa}

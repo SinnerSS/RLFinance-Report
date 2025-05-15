@@ -2,13 +2,14 @@
 \documentclass[a4paper,13pt,3p,twoside]{report}
 
 \input{preamble.tex}
-\selectlanguage{vietnamese}
 
 \begin{document}
 
+\selectlanguage{vietnamese}
 \input{content/0_1_cover.tex}
 \pagestyle{empty}
 
+\selectlanguage{english}
 \newpage
 \input{content/0_2_acknowledgment.tex}
 \pagenumbering{gobble}
@@ -61,8 +62,6 @@
 \chapter{INTRODUCTION}
 \input{content/1_introduction.tex}
 
-
-
 \newpage
 \chapter{LITERATURE REVIEW}
 \input{content/2_literature_review.tex}
@@ -83,9 +82,5 @@
 \chapter{CONCLUSIONS}
 \input{content/6_conclusions.tex}
 
-\newpage
-\chapter*{SHORT NOTICES ON REFERENCE}
-\label{chapter:reference}
-\input{content/7_reference.tex}
-
+\printbibliography
 \end{document}

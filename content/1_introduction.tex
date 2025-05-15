@@ -1,63 +1,33 @@
-Lưu ý: Mẫu ĐATN này được thiết kế phù hợp với đồ án tốt nghiệp theo hướng nghiên cứu. Mẫu đề tài này là gợi ý tham khảo. Tuỳ từng đề tài, cấu trúc có thể thay đổi ít nhiều. Sinh viên cần tham khảo ý kiến của giáo viên hướng dẫn để đưa ra cấu trúc hợp lý nhất cho đề tài của mình. 
-
-Trước khi viết ĐATN, sinh viên cần đọc kỹ hướng dẫn và quy định chi tiết về cách viết ĐATN trong Phụ lục A. 
-
-Khi đóng quyển ĐATN, sinh viên cần lưu ý tuân thủ hướng dẫn ở phụ lục A.9
-
-SV cần đặc biệt lưu ý cách hành văn. Mỗi đoạn văn không được quá dài và cần có ý tứ rõ ràng, bao gồm duy nhất một ý chính và các ý phân tích bổ trợ để làm rõ hơn ý chính. Các câu văn trong đoạn phải đầy đủ chủ ngữ vị ngữ, cùng hướng đến chủ đề chung. Câu sau phải liên kết với câu trước, đoạn sau liên kết với đoạn trước. Trong văn phong khoa học, sinh viên không được dùng từ trong văn nói, không dùng các từ phóng đại, thái quá, các từ thiếu khách quan, thiên về cảm xúc, về quan điểm cá nhân như “tuyệt vời”, “cực hay”, “cực kỳ hữu ích”, v.v. Các câu văn cần được tối ưu hóa, đảm bảo rất khó để thể thêm hoặc bớt đi được dù chỉ một từ. Cách diễn đạt cần ngắn gọn, súc tích, không dài dòng.
-
-Chương 1 có độ dài từ 3 đến 6 trang với các nội dung sau đây
-
+Chapter 1 provides general knowledge about the problem, objectives and contribution of this paper. Section \ref{sec:problem} lays the foundation for the study by describing the core problem of designing an autonomous trading system capable of navigating the uncertainties and complexities of modern equity markets. Section \ref{sec:background} then provides essential background on the mechanics of stock trading, highlighting the roles of market sentiment, information asymmetry, volatility, and information overload in shaping price dynamics. Building on this financial context, section \ref{sec:objectives}  proceeds to define the research objectives and present a conceptual framework in which market data and textual sentiment signals are jointly processed by a learning‐based trading agent. Finally, section \ref{sec:contribution} concludes with a concise enumeration of the thesis’s main contributions, setting the stage for the detailed literature review and technical development that follow.
 
 \section{Problem Statement}
-\label{sec:dvd}
-Phần này sinh viên mô tả bài toán cần giải quyết, lý do tại sao lại chọn bài toán đó, ý nghĩa/tầm quan trọng của bài toán.
+\label{sec:problem}
+Stock trading entails the buying and selling of equity shares in publicly traded companies with the goal of generating profit (through capital gains and dividends) and managing portfolio risk. In practice, traders place orders on organized exchanges or over-the-counter markets, where supply and demand drive price formation. Ideally, each share’s price reflects all available information about the issuing company and market conditions. Classical financial theory (the Efficient Market Hypothesis) posits that new information is quickly incorporated into stock prices, implying that prices follow a random walk \cite{Malkiel2003}. In such a world, neither technical analysis (searching for patterns in past prices) nor fundamental analysis (evaluating a company’s financials) can consistently earn returns above a simple buy-and-hold strategy. Nevertheless, real markets deviate from this ideal. The problem in automated trading arises because actual markets exhibit high uncertainty and complexity: prices swing unpredictably, often driven by investor sentiments, rumors, or insider information, and traders must process an enormous volume of data to make decisions \cite{Kyle1985, Malkiel2003, Kahneman2011, Ivashina2011}. This thesis addresses the challenge of building an autonomous trading system that can navigate these complexities and exploit patterns that human traders might miss.
 
-Tiêu đề của chương này có thể để là ``đặt vấn đề'', hoặc lấy chính tên của bài toán mà sinh viên định giải quyết, ví dụ có thể đặt tiêu đề là ``Bài toán dự đoán …” 
+\section{Background and Problems of Research}
+\label{sec:background}
+In order to understand the trading environment, we first consider the goals and mechanics of stock trading. Investors aim to buy shares at a low price and sell them at a higher price, or to earn dividends over time. Trading takes place on exchanges (such as NYSE or Nasdaq) and in various alternative venues, where buy and sell orders interact through an order-book mechanism. Market liquidity – the ease with which shares can be bought or sold without large price impact – is crucial for efficient trading. Transaction costs, bid-ask spreads, and market regulations all influence trading mechanics, but a unifying principle is that stock prices are meant to reflect a company’s value as well as collective market expectations \cite{Brealey2022}.
 
+A central challenge in trading is dealing with market sentiment and information asymmetry. Market sentiment refers to the overall mood or attitude of investors (e.g. optimism or fear), which can cause price swings independent of fundamental values. Behavioral finance shows that investor mood can drive short-term fluctuations: when sentiment is high, traders may buy aggressively and push prices up; when sentiment sours, selling pressure can exacerbate declines \cite{Kahneman2011}. In fact, studies of investor sentiment indices find that shifts in sentiment can lead to increased volatility and even sudden price jumps in the short term \cite{Ung2024}. Information asymmetry occurs when some participants possess private or superior information while others do not. Classic market models demonstrate that informed traders will exploit this advantage to profit at the expense of uninformed traders \cite{Kyle1985}. Consequently, asymmetric information can amplify price volatility: empirical work shows that proxies for information imbalance (such as the probability of informed trading) tend to predict surges in volatility \cite{Watanabe2008}. In summary, investor psychology and uneven information distribution introduce noise and unpredictability beyond what purely rational models would predict.
 
-\section{Background and Problems of Research} 
-\label{sec:giaiphap}
-Sinh viên trước tiên cần trình bày tổng quan các kết quả của các nghiên cứu hiện nay cho bài toán giới thiệu ở phần \ref{sec:dvd}. Sau đấy, sinh viên đưa ra các hạn chế của các giải pháp hiện tại. 
+Volatility and noise are fundamental features of financial markets. Volatility measures the degree of price fluctuation over time (a higher volatility implies larger swings and more risk). Equities often exhibit volatility clustering – high-volatility periods followed by calm, and vice versa – due to the arrival of news and trading dynamics. Moreover, “noise traders” (those trading on rumors, emotion, or irrelevant information) continuously move prices away from fundamental values \cite{DeLong1990}. In fact, theoretical work suggests that some noise is required for markets to function: without random trades, any trader seeking to exploit an undervalued stock would immediately reveal valuable information and cause the market to adjust, preventing profitable trades \cite{Grossman1980}. However, excess noise increases risk. Empirical research highlights that uncertainty and hidden information raise volatility: for example, heightened information asymmetry or sentiment shifts are associated with large price jumps and more erratic markets.
+
+Another pervasive issue is information overload. Today’s investors have access to enormous amounts of data: traditional news outlets, regulatory filings, social media, analyst reports, and more. While more information in principle should help price discovery, human traders have limited capacity to process it all. Recent studies confirm that excessive information flow can actually hinder decision-making: when public information becomes overwhelming, traders require higher expected returns (risk premia) to compensate for the added uncertainty, and markets tend to exhibit lower trading volume and higher overall returns in the following months \cite{Bernales2023}. In effect, information overload elevates estimation risk and reduces decision accuracy. Thus, even if data is available, finding the truly relevant signals amidst the noise is a nontrivial task.
+
+Given these challenges, traditional trading strategies have notable limitations. Technical analysis tries to exploit patterns in historical price charts to forecast future moves \cite{Murphy1999}. Fundamental analysis attempts to gauge a stock’s intrinsic value from company financials and macroeconomic factors, under the assumption that prices will eventually reflect these fundamentals \cite{Penman2013}. A simple buy-and-hold approach relies on broad market growth over the long term, letting equity positions appreciate passively. Under the ideal of market efficiency, however, these strategies should not consistently outperform a passive portfolio \cite{Malkiel2003}. In practice, traders find that pure technical or fundamental approaches often fail to account for sudden sentiment shifts or new information (the “unknown unknowns”) \cite{Taleb2007}. For instance, technical rules may generate false signals during turbulent periods, and fundamental valuations can lag in reacting to real-time news. Moreover, empirical evidence shows that active trading often underperforms passive strategies: Barber and Odean report that individual investors who traded frequently earned significantly lower returns than they would have by simply holding their initial portfolios \cite{Barber2000}. This gap arises from transaction costs, timing mistakes, and behavioral biases. Collectively, these observations suggest that no single conventional method fully captures the complexity of modern markets.
 
 \section{Research Objectives and Conceptual Framework}
-Trong chương này, sinh viên trước hết trình bày mục tiêu của đồ án là gì, sau đấy sinh viên đề xuất định hướng giải pháp của mình. Tốt nhất là với trình bày từng giải pháp đối với mỗi vấn đề nêu ra trong chương \ref{sec:giaiphap}. 
+\label{sec:objectives}
+The overarching objective of this research is to develop an automated trading framework that can effectively navigate the challenges outlined above. Specifically, we aim to create a decision-making agent that learns to trade equities by combining traditional market data (prices, volumes, financial ratios, etc.) with alternative information sources that reflect market sentiment (news articles). The conceptual framework envisions a simulated trading environment where an agent observes market states and chooses buy/sell/hold actions to maximize long-term return. In doing so, the agent must infer value-relevant signals from noisy data streams and adapt to changing conditions.
 
-\section{Contributions}
-Trong phần này sinh viên liệt kê cụ thể, ngắn gọn các đóng góp của đồ án. Ví dụ: 
+This leads to two core goals: (i) to integrate textual and sentiment information into the trading model so that the agent can anticipate shifts in investor mood or news-driven volatility, and (ii) to employ a \gls{RL} algorithm that enables the agent to discover and exploit profitable patterns without relying on fixed rules. The conceptual architecture is thus a sequential decision process: at each time step, the agent receives numerical market indicators and sentiment metrics (derived from text), processes them to form an internal state representation, and then takes an action. The market’s response (price movements, executed orders) feeds back as the next state, along with a reward signal related to profit and risk. Over many simulated trading periods, the agent iteratively improves its policy to better capture how different signals (including investor sentiment and news) should influence trading decisions. This framework acknowledges the problems identified earlier (volatility, noise, overload) by explicitly modeling the uncertainty in market feedback and by providing a mechanism to learn which aspects of the information are most predictive.
 
-Đồ án này có 3 đóng góp chính như sau:
+\section{Contribution}
+\label{sec:contribution}
+This study makes several key contributions to the field of automated stock trading. 
 
-\begin{enumerate}
-\item Đồ án đề xuất một phương pháp tiền xử lý dữ liệu nhằm loại bỏ nhiễu và dữ liệu ngoại lai trước khi đưa vào huấn luyện mô hình.
-\item \ldots
-\item \ldots 
-\end{enumerate}
-
-\section{Organization of Thesis}
-Phần còn lại của báo cáo đồ án tốt nghiệp này được tổ chức như sau. 
-
-Chương 2 trình bày về v.v. 
-
-Trong Chương 3, em/tôi giới thiệu về v.v.
-
-Chú ý: Sinh viên cần viết mô tả thành đoạn văn đầy đủ về nội dung chương. Tuyệt đối không viết ý hay gạch đầu dòng. Chương 1 không cần mô tả trong phần này. 
-
-Ví dụ tham khảo mô tả chương trong phần bố cục đồ án tốt nghiệp: Chương *** trình bày đóng góp chính của đồ án, đó là một nền tảng ABC cho phép khai phá và tích hợp nhiều nguồn dữ liệu, trong đó mỗi nguồn dữ liệu lại có định dạng đặc thù riêng. Nền tảng ABC được phát triển dựa trên khái niệm DEF, là các module ngữ nghĩa trợ giúp người dùng tìm kiếm, tích hợp và hiển thị trực quan dữ liệu theo mô hình cộng tác và mô hình phân tán.  
-
-Chú ý: Trong phần nội dung chính, mỗi chương của đồ án nên có phần Tổng quan và Kết chương. Hai phần này đều có định dạng văn bản “Normal”, sinh viên không cần tạo định dạng riêng, ví dụ như không in đậm/in nghiêng, không đóng khung, v.v... 
-
-Trong phần Tổng quan của chương N, sinh viên nên có sự liên kết với chương N-1 rồi trình bày sơ qua lý do có mặt của chương N và sự cần thiết của chương này trong đồ án. Sau đó giới thiệu những vấn đề sẽ trình bày trong chương này là gì, trong các đề mục lớn nào.
-
-Ví dụ về phần Tổng quan: Chương 3 đã thảo luận về nguồn gốc ra đời, cơ sở lý thuyết và các nhiệm vụ chính của bài toán tích hợp dữ liệu. Chương 4 này sẽ trình bày chi tiết các công cụ tích hợp dữ liệu theo hướng tiếp cận “mashup”. Với mục đích và phạm vi của đề tài, sáu nhóm công cụ tích hợp dữ liệu chính được trình bày bao gồm: (i) nhóm công cụ ABC trong phần 4.1, (ii) nhóm công cụ DEF trong phần 4.2, nhóm công cụ GHK trong phần 4.3, v.v...
-
-Trong phần Kết chương, sinh viên đưa ra một số kết luận quan trọng của chương. Những vấn đề mở ra trong Tổng quan cần được tóm tắt lại nội dung và cách giải quyết/thực hiện như thế nào. Sinh viên lưu ý không viết Kết chương giống hệt Tổng quan. Sau khi đọc phần Kết chương, người đọc sẽ nắm được sơ bộ nội dung và giải pháp cho các vấn đề đã trình bày trong chương. Trong Kết chương, Sinh viên nên có thêm câu liên kết tới chương tiếp theo.
-
-Ví dụ về phần Kết chương: Chương này đã phân tích chi tiết sáu nhóm công cụ tích hợp dữ liệu. Nhóm công cụ ABC và DEF thích hợp với những bài toán tích hợp dữ liệu phạm vi nhỏ. Trong khi đó, nhóm công cụ GHK lại chứng tỏ thế mạnh của mình với những bài toán cần độ chính xác cao, v.v. Từ kết quả nghiên cứu và phân tích về sáu nhóm công cụ tích hợp dữ liệu này, tôi đã thực hiện phát triển phần mềm tự động bóc tách và tích hợp dữ liệu sử dụng nhóm công cụ GHK. Phần này được trình bày trong chương tiếp theo – Chương 5.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=1.0\textwidth]{images/ANN.png}
-  \caption{ANN}
-  \label{fig:ANN}
-\end{figure}
+\begin{itemize}
+  \item Developed a processing pipeline that gathers financial news articles and transforms them into structured sentiment scores linked to specific stock tickers and dates using a \gls{LLM} model.
+  \item Incorporated these sentiment signals into a deep reinforcement learning framework by embedding them within the environment’s reward function.
+  \item Performed extensive backtesting of the sentiment-enhanced RL agent on historical market and news data, benchmarking its performance against standard strategies such as Buy-and-Hold, Universal Portfolio, CORN, and Anti-CORN.
+\end{itemize}

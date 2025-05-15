@@ -14,7 +14,6 @@
 \usepackage{pdflscape}
 \usepackage{graphicx}
 
-\usepackage{appendix}
 \usepackage{xcolor}
 
 \usepackage{amsthm}
@@ -36,10 +35,18 @@
 \usepackage{listings}
 \usepackage{subcaption}
 
-\usepackage[nonumberlist, nopostdot, nogroupskip, acronym]{glossaries-extra}
+\usepackage[nonumberlist, nopostdot, nogroupskip, acronym]{glossaries}
 \usepackage{glossary-superragged}
 \setglossarystyle{superraggedheaderborder}
+\renewcommand*{\acronymname}{LIST OF ABBREVIATIONS}
+\renewcommand*{\entryname}{Abbreviation}
+\renewcommand*{\descriptionname}{Definition}
 \input{glossary.tex}
+
+\usepackage{appendix}
+\renewcommand\appendixname{APPENDIX}
+\renewcommand\appendixpagename{APPENDIX}
+\renewcommand\appendixtocname{APPENDIX}
 
 \usepackage{setspace}
 \usepackage{blindtext}
@@ -120,3 +127,8 @@
     {\thecontentslabel \ }
     {}
     {\titlerule*[0.3pc]{.}\contentspage}
+
+
+\renewcommand{\figurename}{Figure}
+\renewcommand{\tablename}{Table}
+\renewcommand{\chaptername}{CHAPTER}

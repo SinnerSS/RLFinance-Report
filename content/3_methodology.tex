@@ -1,11 +1,165 @@
+Based on the fundamental concepts laid out in chapter \ref{chap:literature}, chapter 3  outlines the research methodology employed to develop and evaluate an LLM-Augmented Reinforcement Learning system for automatic stock trading. It begins with section \ref{sec:overview}, an overview of the proposed solution, followed by detailed descriptions of each key component and process.
+
 \section{Overview}
-Phần này mô tả tổng quan giải pháp gồm những bước chính nào, hoạt động ra sao. Mục tiêu của phần này là cho người đọc một cái nhìn tổng thể về giải pháp. Để cho dễ hiểu thì nên có một biểu đồ mô tả luồng hoạt động của giải pháp đề xuất. 
+\label{sec:overview}
+The proposed network operates in five key stages, beginning with data acquisition and progressing to agent training. First, \gls{OHLCV} price data and unstructured news data (headlines or summaries) are collected from financial databases, and a new dataset. Next, the news data is processed by an \gls{LLM} to extract sentiment signals, transforming raw text into quantifiable sentiment metrics. The pipeline then enters the feature engineering stage, where technical indicators derived from the \gls{OHLCV} data are combined with the \gls{LLM}-generated sentiment indicators. Finally, an environment is created with a custom reward structure to reward following the market environment, a \gls{SAC} agent is trained through iterative interaction with the environment, optimizing its policy to maximize cumulative rewards. The resulting agent autonomously executes trades by synthesizing technical signals and sentiment-driven insights, aiming to outperform sentiment-agnostic strategies.
 
-\section{Tên của nội dung chi tiết thứ 1}
-Tên của các chương này đặt theo nội dung mà sinh viên sẽ trình bày trong từng chương. 
+\section{Data Acquisition}
+\label{sec:data}
+This section details the processes involved in gathering and preparing the necessary data, which includes historical financial market data for a defined set of stocks and a specific financial news dataset. The quality and structure of this input data are foundational to the subsequent stages of sentiment analysis, feature engineering, and \gls{RL} agent training.
 
-Các chương tiếp theo mô tả chi tiết về các bước, các thuật toán trong giải pháp đề xuất. Có thể trình bày pseudocode cho từng bước. Chú ý, pseudocode chỉ có tác dụng làm chi tiết hoá giải thuật chứ không thay thế được phần thuyết minh về giải thuật. Đối với những chi tiết kỹ thuật khó hiểu nên có các hình minh hoạ để người đọc dễ hiểu. Mỗi một thuật toán/bước thực hiện nên tách ra thành một chương. 
+\subsection{Financial Market Data}
+Historical \gls{OHLCV} data for a curated list of 100 predefined stocks (stocks in the Nasdaq-100 on September 13, 2023) will be acquired. The primary source for this financial data will be the Yahoo Finance API. 
 
-\section{Tên của nội dung chi tiết thứ 2}
+The data will cover the period from January 1, 2016, to December 28, 2023, inclusive. Data will be collected at a daily frequency. The complete dataset will be chronologically divided into training, validation, and testing sets, spanning 5 years, 1 year, and 1 year, respectively. Table \ref{tab:prices} provide a few samples of price data collected.
 
+\begin{table}
+  \centering
+  \csvreader[
+    tabular = {|c|c|F|F|F|F|c|},
+    head to column names,
+    table head = \hline Date & {Symbol} & {Open} & {High} & {Low} & {Close} & {Volume}{}\\\hline,
+    late after line = \\\hline
+  ]{data/sample_price.csv}{}{
+    \date & \tic & \open & \high & \low & \close & \volume
+  }
+  \caption{Sample price data from Yahoo Finance API}
+  \label{tab:prices}
+\end{table}
 
+\subsection{News Data}
+For news data, this research will utilize the Financial News and Stock Price Integration Dataset. This dataset contains 15.7 millions financial news records for 4775 S\&P500 companies from 1999 to 2023 \cite{Dong2024}. The dataset include date, news headlines, stock symbols mentioned in the content and several types of summaries. LexRank builds a similarity graph of sentences and applies a PageRank‐style algorithm to identify the most “central” sentences that best represent the document. Luhn’s method scores sentences by the density and clustering of high‐frequency (non‐stop) words, favoring sentences where key terms are tightly grouped. \gls{LSA} Latent Semantic Analysis) uses singular value decomposition on the term–sentence matrix to uncover underlying thematic dimensions and then selects sentences that contribute most strongly to those principal topics. Together, these approaches offer diverse, statistically grounded summaries from which our pipeline can choose.
+
+\section{Sentiment Extraction}
+After news data are acquired as outline in the \ref{sec:data}, relevant news data will be processed into prompt to be sent to an \gls{LLM} model for sentiment extraction. The prompt template designed for this purpose is provided in \ref{fig:prompt}. In crafting the financial news annotation prompt, several key prompt‐engineering strategies are implemented to ensure that the model delivers precise, consistent, and machine‐readable output. The prompt begin with a clear system‐level framing, “You are an expert financial news annotator”, to establish domain context and tone. The prompt then enforces a strict JSON schema by specifying exactly two fields (sentiment\_score and news\_type) and enumerating all valid category values (with “other” as a fallback), thereby constraining responses to a controlled vocabulary and simplifying downstream parsing. A concise few‐shot example of input and output further illustrates the desired format and style, boosting the model’s ability to replicate the structure. Finally, to maintain uniformity in the input text, we define a summary selection rule for our dataset, each article is preprocessed into three possible summaries (Lexrank summary, Luhn summary, \gls{LSA} summary), and the model is instructed to inspect these in that exact order, using only the first nonempty summary it encounters. These techniques reliably guide the model to produce consistent, high‐quality JSON annotations.
+
+\begin{figure}
+  \centering
+  \lstinputlisting[
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+  ]{data/prompt_template.txt}
+  \caption{Prompt template used to process news data into prompts}
+  \label{fig:prompt}
+\end{figure}
+
+The model chosen for sentiment annotation is DeepSeek-V3 model \cite{DeepSeekV3}. DeepSeek-V3, developed by DeepSeek AI, is a powerful open-source Mixture-of-Experts (MoE) large language model with 671 billion parameters, of which 37 billion are active during inference. Built on a Transformer framework, it incorporates Multi-Head Latent Attention for efficient processing and DeepSeekMoE for cost-effective training.
+
+After the sentiment scores are returned, several additional news feature are computed. First is mean sentiment:
+\[\bar{s}_{i,d}  = \frac{1}{N_{i,d}} \sum_{j=1}^{N_{i,d}} s_{i,d,j}\]
+where \(s_{i,d,j}\) is the sentiment score for the \(j\)-th news item about stock \(i\) on day \(d\), \(N_{i,d}\) is the total number of news items for stock \(i\) on day \(d\).
+
+Following that, mean sentiment score of the \(k\)-th most recent news are calculated:
+\[\bar{s}_{i,d}^{(k)} = \frac{1}{k} \sum_{j=1}^{k} s_{i,d,(j)}\]
+where \(s_{i,d,(j)}\) is the sentiment score of the \(j\)-th most recent news item about stock \(i\) on day \(d\), and \(k\) is the number of most-recent items included in the average.
+
+\section{Feature Engineering}
+
+Upon successful data acquisition and sentiment extraction, the pipeline advances to the feature engineering stage. This crucial phase involves the creation of a comprehensive set of input variables, or features, that will inform the decision-making process of the \gls{RL} agent. The technical indicators are calculated from the historical \gls{OHLCV} data for each of the selected stocks. These indicators are widely used in financial analysis to identify trends, momentum, volatility, and potential overbought or oversold conditions. The following specific technical indicators will be computed: \gls{MACD}, \gls{BB}, \gls{RSI}, \gls{CCI}, and \gls{DMI}.
+
+\subsection{Moving Average Convergence Divergence}
+The \gls{MACD} is a momentum indicator that illustrates the relationship between two \gls{EMA} of a security’s closing price. It is used to identify changes in trend strength, direction, momentum, and duration.
+
+For any look-back period \(n\), define the \gls{EMA} smoothing coefficient as:
+\[\alpha_n = \frac{2}{n+1}\]
+The exponential moving average of the closing price \(C_t\) at time \(t\) is given recursively by:
+\[\mathrm{EMA}_{n,t} = \alpha_n C_t + (1 - \alpha_n) \mathrm{EMA}_{n,t-1} , \quad \mathrm{EMA}_{n,0} := C_0\]
+The standard \gls{MACD} line is the difference between a “fast” \gls{EMA} (\(n=12\)) and a “slow” \gls{EMA} (\(n=26\)):
+\[\mathrm{MACD}_t = \mathrm{EMA}_{12,t} - \mathrm{EMA}_{26,t}\]
+Many practitioners also compute a 9-period \gls{EMA} of the \gls{MACD} line (signal line) and plot the difference as a histogram:
+\[\mathrm{Signal}_t = \mathrm{EMA}_{9}\bigl(\mathrm{MACD}\bigr)_t, \qquad \mathrm{Hist}_t = \mathrm{MACD}_t - \mathrm{Signal}_t\]
+
+In practice, cross-overs of the \gls{MACD} line and its signal line generate buy and sell signals, while divergences between the \gls{MACD} and price can foreshadow potential trend reversals. Adjusting the \gls{EMA} periods allows traders to tune the indicator’s sensitivity to match different timeframes and volatility regimes.
+
+\subsection{Bollinger Bands (Upper and Lower)}
+The \gls{BB} are volatility indicators that measure the dispersion of price around a simple moving average, providing dynamic support and resistance levels.
+
+Let the \(n\)-period simple moving average (SMA) of the closing price \(C_t\) be:
+\[\mathrm{SMA}_{n,t} = \frac{1}{n} \sum_{i=0}^{n-1} C_{t-i}\]
+Define the \(n\)-period rolling standard deviation of \(C_t\) by:
+\[\sigma_{n,t} = \sqrt{\frac{1}{n} \sum_{i=0}^{n-1} (C_{t-i} - \mathrm{SMA}_{n,t})^2}\]
+Then the upper and lower Bollinger Bands with multiplier \(k\) are:
+\[\mathrm{BOLL\_UB}_{n,t} = \mathrm{SMA}_{n,t} + k \sigma_{n,t}, \qquad \mathrm{BOLL\_LB}_{n,t} = \mathrm{SMA}_{n,t} - k \sigma_{n,t}\]
+
+In practice, prices touching or breaching the upper band suggest overbought conditions, while contacts with the lower band signal oversold conditions. Traders use \gls{BB} to gauge volatility expansion and contraction, identify potential reversal points, and set dynamic entry and exit levels.
+
+\subsection{Relative Strength Index}
+The \gls{RSI} is a momentum oscillator that measures the speed and change of price movements, identifying overbought or oversold conditions.
+
+For a look‐back period \(n\), let the price change at time \(t\) be:
+\[\Delta_t \;=\; C_t \;-\; C_{t-1}\]
+Define the average gain and average loss over the past \(n\) periods by:
+\[\mathrm{Gain}_{n,t} = \frac{1}{n} \sum_{i=1}^{n} \max(\Delta_{t-i+1},0), \quad \mathrm{Loss}_{n,t} = \frac{1}{n} \sum_{i=1}^{n} \max(-\Delta_{t-i+1},0)\]
+The relative strength is:
+\[\mathrm{RS}_t = \frac{\mathrm{Gain}_{n,t}}{\mathrm{Loss}_{n,t}},\]
+and the RSI is then:
+\[\mathrm{RSI}_t = 100 - \frac{100}{1 + \mathrm{RS}_t}\]
+
+In practice, \gls{RSI} values above 70 suggest overbought conditions, while values below 30 suggest oversold conditions. Traders use \gls{RSI} to time entry and exit points by spotting divergences and confirming trend strength.
+
+\subsection{Commodity Channel Index}
+The \gls{CCI} is an oscillator that measures the deviation of price from its statistical mean, highlighting cyclical overbought and oversold conditions.
+
+For a look‐back period \(n\), define the typical price at time \(t\) as
+\[\mathrm{TP}_t = \frac{H_t + L_t + C_t}{3}\]
+where \(H_t\), \(L_t\), and \(C_t\) are the high, low, and closing prices.  Compute the simple moving average of the typical price:
+\[\mathrm{MA}_{n,t} = \frac{1}{n} \sum_{i=0}^{n-1} \mathrm{TP}_{t-i}\]
+Next, define the mean deviation of the typical price:
+\[\mathrm{MD}_{n,t} = \frac{1}{n} \sum_{i=0}^{n-1} |\mathrm{TP}_{t-i} - \mathrm{MA}_{n,t}\]
+The CCI is then given by:
+\[\mathrm{CCI}_t = \frac{\mathrm{TP}_t - \mathrm{MA}_{n,t}}{0.015 \times \mathrm{MD}_{n,t}}\]
+
+In practice, \gls{CCI} values above \(+100\) indicate potential overbought conditions, while values below \(-100\) signal potential oversold conditions. Traders use \gls{CCI} to spot trend strength, identify entry and exit points, and confirm divergences between price action and momentum.
+
+\subsection{Directional Movement Index)}
+The Directional Movement Index (DMI) is a trend‐strength indicator that compares positive and negative directional movements relative to the true range, quantifying the presence and momentum of a price trend.
+
+For each period \(t\), compute the upward and downward price movements:
+\[
+\mathrm{UM}_t = H_t - H_{t-1}, 
+\quad
+\mathrm{DM}_t = L_{t-1} - L_t,
+\]
+\[
+\begin{aligned}
+\mathrm{DM}^+_t &= 
+  \begin{cases}
+    \mathrm{UM}_t, & \mathrm{UM}_t > \mathrm{DM}_t \text{ and } \mathrm{UM}_t > 0,\\
+    0, & \text{otherwise},
+  \end{cases}
+  \\
+\mathrm{DM}^-_t &= 
+  \begin{cases}
+    \mathrm{DM}_t, & \mathrm{DM}_t > \mathrm{UM}_t \text{ and } \mathrm{DM}_t > 0,\\
+    0, & \text{otherwise}
+  \end{cases}
+\end{aligned}
+\]
+Define the true range:
+\[\mathrm{TR}_t = \max(H_t - L_t, |H_t - C_{t-1}|, |L_t - C_{t-1}|)\]
+Over a look‐back period \(n\), form the smoothed averages:
+\[\mathrm{TR}_{n,t} = \frac{1}{n} \sum_{i=0}^{n-1} \mathrm{TR}_{t-i}, \quad \mathrm{DM}^+_{n,t} = \frac{1}{n} \sum_{i=0}^{n-1}\mathrm{DM}^+_{t-i}, \quad \mathrm{DM}^-_{n,t} = \frac{1}{n} \sum_{i=0}^{n-1} \mathrm{DM}^-_{t-i}\]
+Compute the directional indicators:
+\[\mathrm{DI}^+_{n,t} =100 \frac{\mathrm{DM}^+_{n,t}}{\mathrm{TR}_{n,t}}, \quad \mathrm{DI}^-_{n,t} = 100 \frac{\mathrm{DM}^-_{n,t}}{\mathrm{TR}_{n,t}}.\]
+The directional index (DX) measures the difference between the two:
+\[\mathrm{DX}_t = 100 \frac{|\mathrm{DI}^+_{n,t} - \mathrm{DI}^-_{n,t}|}{\mathrm{DI}^+_{n,t} + \mathrm{DI}^-_{n,t}}\]
+Finally, the \gls{ADX} is the \(n\)-period simple moving average of \(\mathrm{DX}\):
+\[\mathrm{ADX}_t = \frac{1}{n} \sum_{i=0}^{n-1} \mathrm{DX}_{t-i}\]
+
+In practice, rising \gls{ADX} values indicate strengthening trend momentum (regardless of direction), while falling values signal weakening trends. Traders use \gls{DMI} and \gls{ADX} to confirm trend presence, gauge its strength, and generate trade signals when directional indicators cross.
+
+\section{Agent Training}
+The trading system is modeled as a partially observable Markov decision process (POMDP) operating on a daily time step. At each step \(t\), the agent observes a feature vector composed of the following information: \gls{OHLCV} data, technical indicators, and sentiment signals. 
+
+To prepare each feature series for the agent, we first convert all price columns (open, high, low, close) into log returns by taking the natural logarithm of today’s price over yesterday’s, then filling any gaps. Trading volume is smoothed by applying a logarithmic transform and standardized using a rolling mean and standard deviation over a fixed window, shifted to avoid lookahead, with forward- and backward-filling to handle edge effects. Oscillators like \gls{MACD} and \gls{CCI} undergo the same rolling z-score standardization. \gls{BB} are summarized into a percentage metric by comparing the current price to its upper and lower bands. Short and longterm moving averages are expressed as ratios of the current price to their respective averages, minus one. \gls{RSI} and \gls{ADX}, which inherently range from 0 to 100, are simply rescaled to a 0–1 interval. Finally, all news sentiment metrics, including mean sentiment, news counts, and longer-term rolling averages,are normalized via the same rolling z-score procedure. After these steps, we verify that no missing values remain, yielding a fully standardized feature set for robust agent training.
+
+The agent's reward at each daily time step \(t\), denoted \(R_t\), is formulated to optimize the portfolio's log returns from trades executed at the beginning of day \(t\), incorporate a sentiment-based shaping mechanism. The action \(a_t\) is chosen based on state \(s_t\) (reflecting market conditions and holdings at the start of day \(t\), using prices \(P_{i,t-1}\) and sentiment \(\text{sent}_j(s_t)\)). This action \(a_t\) determines the portfolio holdings \(h'_j(s_t)\) for day \(t\). The primary financial reward is the portfolio's weighted average log return realized over day \(t\), using prices \(P_{i,t-1}\) at trade execution and closing prices \(P_{i,t}\). The sentiment reward shaping component, \( \gamma \Phi(s_{t+1}) - \Phi(s_t) \), guides the agent by comparing the potential \(\Phi(s_t)\) of the state before action \(a_t\) (based on holdings \(h_j(s_t)\) and sentiment \(\text{sent}_j(s_t)\)) with the potential \(\Phi(s_{t+1})\) of the subsequent state \(s_{t+1}\) (which includes the new holdings \(h'_j(s_t)\) now denoted as \(h_j(s_{t+1})\), and the new sentiment \(\text{sent}_j(s_{t+1})\) for day \(t+1\)). A transaction cost \(C_t\) is subtracted, proportional to the value of assets traded to achieve the new holdings \(h'_j(s_t)\).
+
+The total reward \(R_t\) for the transition from state \(s_t\) via action \(a_t\) to state \(s_{t+1}\) is defined as:
+\[R_t = \sum_{i=1}^{N} \omega'_{i,t} \log\left(\frac{P_{i,t}}{P_{i,t-1}}\right) + \left( \gamma \Phi(s_{t+1}) - \Phi(s_t) \right) - C_t\]
+where \(N\) is the number of stocks; \(P_{i,t}\) is the closing price of stock \(i\) on day \(t\), and \(P_{i,t-1}\) is its closing price on the previous day (used as the execution price for action \(a_t\)); \(h_j(s_t)\) are the shares of stock \(j\) held in state \(s_t\) (i.e., before action \(a_t\)); \(h'_j(s_t)\) are the shares of stock \(j\) held after action \(a_t\) is executed (these are the holdings active during day \(t\)); \(\omega'_{i,t} = \frac{h'_{i}(s_t) \cdot P_{i,t-1}}{PV_{t-1,\text{post-trade}}}\) is the portfolio weight of stock \(i\) after action \(a_t\), with \(PV_{t-1,\text{post-trade}}\) being the total portfolio value after trades for \(a_t\) are made at prices \(P_{i,t-1}\) (but before day \(t\)'s market movements); \(\gamma\) is the agent's discount factor. The potential function \(\Phi(s)\) is given by \( \Phi(s) = k_{\text{sent}} \sum_{j=1}^{N} \text{sent}_j(s) \cdot \text{sgn}(h_j(s)) \), where \(k_{\text{sent}}\) is a scaling hyperparameter, \(\text{sent}_j(s_t)\) is the normalized sentiment for stock \(j\) corresponding to day \(t\) (available in state \(s_t\)), \(\text{sent}_j(s_{t+1})\) is the sentiment for stock \(j\) corresponding to day \(t+1\) (available in state \(s_{t+1}\)), and \(\text{sgn}(\cdot)\) is the sign function (+1 for long, -1 for short, 0 for neutral); specifically, \(\Phi(s_t)\) uses \(h_j(s_t)\) and \(\text{sent}_j(s_t)\), while \(\Phi(s_{t+1})\) uses \(h_j(s_{t+1}) = h'_j(s_t)\) and \(\text{sent}_j(s_{t+1})\). The transaction cost \(C_t\) is calculated as \( C_t = \kappa_{\text{cost}} \frac{\sum_{i=1}^{N} |h'_{i}(s_t) - h_i(s_t)| \cdot P_{i,t-1}}{PV_{t-1,\text{pre-trade}}} \), where \(\kappa_{\text{cost}}\) is the transaction cost rate and \(PV_{t-1,\text{pre-trade}}\) is the portfolio value before trades for action \(a_t\) are executed.
+
+The \gls{SAC} algorithm is employed to learn a stochastic policy that maximizes the expected cumulative shaped reward. The policy network takes the combined feature vector and outputs parameters of a Gaussian distribution over actions. Two Q-value networks estimate the soft return for each state-action pair, and a temperature parameter αα is automatically tuned to ensure a target entropy level, maintaining sufficient exploration. Target Q-networks are updated using Polyak averaging.
+
+In brief, this chapter has detailed how we integrate historical price data and \gls{LLM}-extracted sentiment into a unified feature set, standardize and normalize all inputs, and created an environment with sentiment-shaped reward. A \gls{SAC} agent is then trained—balancing profit, sentiment guidance, and transaction costs—to learn an optimal policy.

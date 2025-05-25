@@ -3,17 +3,21 @@
 \usepackage{fontspec}
 \setmainfont{Times New Roman}
 \usepackage[fontsize=13pt]{scrextend}
-\usepackage[top=2cm, bottom=2cm, left=3.5cm, right=2.5cm]{geometry}
 \usepackage{lmodern}
 
+\usepackage[top=2cm, bottom=2cm, left=3.5cm, right=2.5cm]{geometry}
 \usepackage{parskip}
 \usepackage{indentfirst}
+\usepackage{setspace}
+
 \usepackage{enumitem}
 \usepackage{outlines}
 
 \usepackage{float}
 \usepackage{pdflscape}
 \usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage[font=small,labelfont=bf]{caption}
 
 \usepackage{xcolor}
 
@@ -24,17 +28,20 @@
 \usepackage{amsbsy}
 \usepackage{array}
 \usepackage{subfiles}
+\usepackage{siunitx}
+\newcolumntype{F}{S[table-format=3.2, round-mode=places, round-precision=2]}
+
 \usepackage{titlesec}
 \usepackage{titletoc}
 \usepackage{chngcntr}
 \usepackage{afterpage}
+
 \usepackage[ruled,vlined]{algorithm2e}
+\usepackage{listings}
 \usepackage{capt-of}
 \usepackage{multirow}
-\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{csvsimple}
 
-\usepackage{listings}
-\usepackage{subcaption}
 
 \usepackage[nonumberlist, nopostdot, nogroupskip, acronym]{glossaries}
 \usepackage{glossary-superragged}
@@ -49,7 +56,6 @@
 \renewcommand\appendixpagename{APPENDIX}
 \renewcommand\appendixtocname{APPENDIX}
 
-\usepackage{setspace}
 \usepackage{blindtext}
 
 \usepackage{csquotes}

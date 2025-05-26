@@ -150,16 +150,16 @@ The trading system is modeled as a \gls{POMDP} operating on a daily time step. A
 
 To prepare each feature series for the agent, we first convert all price columns  into log returns by taking the natural logarithm of today price over yesterday. Trading volume is smoothed by applying a logarithmic transform and standardized using a rolling mean and standard deviation over a fixed window, shifted to avoid lookahead. Oscillators like \gls{MACD} and \gls{CCI} undergo the same rolling z-score standardization. \gls{BB} are summarized into a percentage metric by comparing the current price to its upper and lower bands. Short and long term moving averages are expressed as ratios of the current price to their respective averages, minus one. \gls{RSI} and \gls{ADX}, which inherently range from \(0\) to \(100\), are simply rescaled to a \(0\)–\(1\) interval. Finally, all news sentiment metrics, including mean sentiment, news counts, and longer term rolling averages, are normalized via the same rolling z-score procedure. 
 
-At each daily time step $t$, the agent receives a shaped reward $R_t$ that combines the portfolio’s log return with a sentiment-based potential shaping term.  Let $\mathbf{w}t = (w{1,t},\dots,w_{N,t})^\top$ denote the portfolio weights at the beginning of day $t$, and let $P_{j,t}$ be the closing price of asset $j$ on day $t$.  We also extract a sentiment score $\mathrm{sent}_j(s_t)$ for each asset $j$ at state $s_t$.  The total reward is:
+At each daily time step \(t\), the agent receives a shaped reward \(R_t\) that combines the portfolio’s log return with a sentiment-based potential shaping term. Let \(\mathbf{w}_t = (w_{1,t},\dots,w_{N,t})^\top\) denote the portfolio weights at the beginning of day \(t\), and let \(P_{j,t}\) be the closing price of asset \(j\) on day \(t\). We also extract a sentiment score \(\mathrm{sent}_j(s_t)\) for each asset \(j\) at state \(s_t\). The total reward is:
 \[R_t = R_t^{\mathrm{price}} + R_t^{\mathrm{sent}}\]
 where the price-based component is the weighted average log return:
-\[R_t^{\mathrm{price}} = \sum_{j=1}^N w_{j,t} ,\log \biggl(\frac{P_{j,t}}{P_{j,t-1}}\biggr)\]
+\[R_t^{\mathrm{price}} = \sum_{j=1}^N w_{j,t} \log \biggl(\frac{P_{j,t}}{P_{j,t-1}}\biggr)\]
 and the sentiment shaping component is defined via a potential function $\Phi(s)$:
-\[\Phi(s_t) = k_{\mathrm{sent}} \sum_{j=1}^N \mathrm{sent}j(s_t) ;\mathrm{sgn}(w{j,t} - w_{j,t-1})\]
-with $k_{\mathrm{sent}}$ a scaling hyperparameter and $\mathrm{sgn}(\cdot)$ the sign function.  The shaping reward is then
+\[\Phi(s_t) = k_{\mathrm{sent}} \sum_{j=1}^N \mathrm{sent}j(s_t) \cdot \mathrm{sgn}(w{j,t} - w_{j,t-1})\]
+with \(k_{\mathrm{sent}}\) a scaling hyperparameter and \(\mathrm{sgn}(\cdot)\) the sign function. The shaping reward is then:
 \[R_t^{\mathrm{sent}} = \gamma,\Phi(s_{t+1}) - \Phi(s_t)\]
-where $\gamma$ is the discount factor.  This construction ensures that changes in sentiment-aligned positions yield additional guidance without altering the optimal policy under reward shaping theory.
+where \(\gamma\) is the discount factor. This construction ensures that changes in sentiment-aligned positions yield additional guidance without altering the optimal policy under reward shaping theory.
 
-We train a Soft Actor-Critic (SAC) agent to maximize the expected cumulative shaped reward.  The policy network outputs the parameters of a Gaussian distribution over portfolio weight adjustments.  Two Q-value networks estimate the soft action-value, and a temperature parameter $\alpha$ is automatically tuned to match a target entropy, promoting exploration.  Target networks for the Q-functions are updated using Polyak averaging.
+We train a \gls{SAC} agent to maximize the expected cumulative shaped reward. The policy network outputs the parameters of a Gaussian distribution over portfolio weight adjustments. Two Q-value networks estimate the soft action-value, and a temperature parameter \(\alpha\) is automatically tuned to match a target entropy, promoting exploration. Target networks for the Q-functions are updated using Polyak averaging.
 
 In brief, this chapter has detailed how we integrate historical price data and \gls{LLM}-extracted sentiment into a unified feature set, standardize and normalize all inputs, and created an environment with sentiment-shaped reward. A \gls{SAC} agent is then trained to learn an optimal policy.

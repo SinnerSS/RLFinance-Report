@@ -74,7 +74,14 @@ Here, \(s_t\) are states (or, in a \gls{POMDP} context, history-derived observat
 \[H(\pi(\cdot|s_t)) = \mathbb{E}_{a_t \sim \pi(\cdot|s_t)}[-log \pi(a_t|s_t)]\] 
 The temperature parameter \(\alpha > 0\), serves as a crucial trade-off coefficient, determining the relative importance of the entropy bonus compared to the extrinsic reward. A higher \(\alpha\) encourages more stochastic, exploratory behavior by pushing the policy towards a more uniform distribution over actions, while a lower \(\alpha\) shifts the focus more towards exploiting known good actions to maximize rewards. This entropy maximization offers several key advantages: it intrinsically promotes exploration, which is vital in complex environments with sparse rewards or deceptive local optima; it leads to policies that tend to be more robust to perturbations as they are less committed to a single, deterministic path; and it can accelerate learning by preventing premature convergence to suboptimal strategies.
 
-To implement this maximum entropy objective, \gls{SAC} employs a sophisticated architecture, typically realized using neural networks for function approximation, which comprises several primary, interconnected components.
+To implement this maximum entropy objective, \gls{SAC} employs a sophisticated architecture, typically realized using neural networks for function approximation, which comprises several primary, interconnected components. Figure \ref{fig:AC} demonstrates the role of the main component actor and critic in \gls{SAC} agent.
+
+\begin{figure}
+  \centering
+    \includegraphics[width=0.8\textwidth]{images/AC_architecture.png}
+    \caption{Actor-Critic Architecture.}
+    \label{fig:AC}
+\end{figure}
 
 First is the Actor, or Policy Network, denoted as \(\pi_\phi(a|s)\) and parameterized by \(\phi\). This network is responsible for learning the agent's behavior. It takes the current state \(s\) as input and outputs the parameters of a probability distribution over the action space. For continuous actions, this is commonly a Gaussian distribution, where the network outputs the mean \(\mu_\phi(s)\) and standard deviation \(\sigma_\phi(s)\). Actions are then stochastically sampled from this distribution during interaction with the environment. The  learning objective of the actor is to choose actions that not only lead to high expected future rewards (as estimated by the critic) but also maintain high policy entropy. To enable gradient-based optimization through the stochastic sampling process, especially in continuous action spaces, \gls{SAC} utilizes the reparameterization trick. This involves expressing the sampled action \(a_t\) as a deterministic function of the policy parameters and an independent noise variable \(\epsilon\): 
 \[a_t = \mu_\phi(s_t) + \sigma_\phi(s_t) \cdot \epsilon, \epsilon \sim \mathcal{N}(0,I)\]

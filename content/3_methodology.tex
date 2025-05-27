@@ -15,6 +15,7 @@ The data will cover the period from January 1, 2016, to December 28, 2023, inclu
 
 \begin{table}
   \centering
+  \small
   \csvreader[
     tabular = {|c|c|F|F|F|F|c|},
     head to column names,
@@ -28,17 +29,44 @@ The data will cover the period from January 1, 2016, to December 28, 2023, inclu
 \end{table}
 
 \subsection{News Data}
-For news data, this research will utilize the Financial News and Stock Price Integration Dataset. This dataset contains 15.7 millions financial news records for 4775 S\&P500 companies from 1999 to 2023 \cite{Dong2024}. The dataset include date, news headlines, stock symbols mentioned in the content and several types of summaries. LexRank builds a similarity graph of sentences and applies a PageRank‐style algorithm to identify the most “central” sentences that best represent the document. Luhn's method scores sentences by the density and clustering of high‐frequency (non‐stop) words, favoring sentences where key terms are tightly grouped. \gls{LSA} Latent Semantic Analysis) uses singular value decomposition on the term–sentence matrix to uncover underlying thematic dimensions and then selects sentences that contribute most strongly to those principal topics. Together, these approaches offer diverse, statistically grounded summaries from which our pipeline can choose.
+For news data, this research will utilize the Financial News and Stock Price Integration Dataset (FNSPID). This dataset contains 15.7 millions financial news records for 4775 S\&P500 companies from 1999 to 2023 \cite{Dong2024}. Table \ref{tab:news} provide a new sample from the dataset. The dataset include date, news headlines, stock symbols mentioned in the content and several types of summaries. LexRank builds a similarity graph of sentences and applies a PageRank‐style algorithm to identify the most “central” sentences that best represent the document. Luhn's method scores sentences by the density and clustering of high‐frequency (non‐stop) words, favoring sentences where key terms are tightly grouped. \gls{LSA} Latent Semantic Analysis) uses singular value decomposition on the term–sentence matrix to uncover underlying thematic dimensions and then selects sentences that contribute most strongly to those principal topics. Together, these approaches offer diverse, statistically grounded summaries from which our pipeline can choose.
+
+\begin{table}
+  \centering
+  \small
+  \csvreader[
+    respect dollar,
+    head to column names,
+    separator=semicolon,
+    before reading=\begin{tabular}{|l|p{.7\linewidth}|}\hline,
+    after reading=\end{tabular},
+    late after line=\\\hline
+  ]{data/sample_news.csv}{}{
+      Date        & \Date \\ \hline
+      Symbol      & \Symbol \\ \hline
+      Headline    & \Headline \\ \hline
+      Text        & \Text \\ \hline
+      URL         & \URL \\ \hline
+      LSA Sum     & \LSA \\ \hline
+      Luhn Sum    & \Luhn \\ \hline
+      TexRank Sum & \TexRank \\ \hline
+      LexRank Sum & \LexRank 
+  }
+  \caption{Sample new data from FNSPID}
+  \label{tab:news}
+\end{table}
 
 \section{Sentiment Extraction}
 After news data are acquired as outline in the \ref{sec:data}, relevant news data will be processed into prompt to be sent to an \gls{LLM} model for sentiment extraction. The prompt template designed for this purpose is provided in \ref{fig:prompt}. In crafting the financial news annotation prompt, several key prompt‐engineering strategies are implemented to ensure that the model delivers precise, consistent, and machine‐readable output. The prompt begin with a clear system‐level framing, “You are an expert financial news annotator”, to establish domain context and tone. The prompt then enforces a strict JSON schema by specifying exactly two fields (sentiment\_score and news\_type) and enumerating all valid category values (with “other” as a fallback), thereby constraining responses to a controlled vocabulary and simplifying downstream parsing. A concise few‐shot example of input and output further illustrates the desired format and style, boosting the ability of the model to replicate the structure. Finally, to maintain uniformity in the input text, we define a summary selection rule for our dataset, each article is preprocessed into three possible summaries (Lexrank summary, Luhn summary, \gls{LSA} summary), and the model is instructed to inspect these in that exact order, using only the first nonempty summary it encounters. These techniques reliably guide the model to produce consistent, high‐quality JSON annotations.
 
-\begin{figure}
+\begin{figure}[!t]
   \centering
+  \small
   \lstinputlisting[
-    basicstyle=\ttfamily\small,
+    basicstyle=\ttfamily\scriptsize,
     breaklines=true,
     frame=single,
+    linewidth=\linewidth
   ]{data/prompt_template.txt}
   \caption{Prompt template used to process news data into prompts}
   \label{fig:prompt}

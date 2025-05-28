@@ -2,7 +2,14 @@ Based on the fundamental concepts laid out in chapter \ref{chap:literature}, cha
 
 \section{Overview}
 \label{sec:overview}
-The proposed network operates in five key stages, beginning with data acquisition and progressing to agent training. First, \gls{OHLCV} price data and unstructured news data (headlines or summaries) are collected from financial databases, and a new dataset. Next, the news data is processed by an \gls{LLM} to extract sentiment signals, transforming raw text into quantifiable sentiment metrics. The pipeline then enters the feature engineering stage, where technical indicators derived from the \gls{OHLCV} data are combined with the \gls{LLM}-generated sentiment indicators. Finally, an environment is created with a custom reward structure to reward following the market environment, a \gls{SAC} agent is trained through iterative interaction with the environment, optimizing its policy to maximize cumulative rewards. The resulting agent autonomously executes trades by synthesizing technical signals and sentiment-driven insights, aiming to outperform sentiment-agnostic strategies.
+The proposed network operates in five key stages, beginning with data acquisition and progressing to agent training. First, \gls{OHLCV} price data and unstructured news data (headlines or summaries) are collected from financial databases, and a new dataset. Next, the news data is processed by an \gls{LLM} to extract sentiment signals, transforming raw text into quantifiable sentiment metrics. The pipeline then enters the feature engineering stage, where technical indicators derived from the \gls{OHLCV} data are combined with the \gls{LLM}-generated sentiment indicators. Finally, an environment is created with a custom reward structure to reward following the market environment, a \gls{SAC} agent is trained through iterative interaction with the environment, optimizing its policy to maximize cumulative rewards. The resulting agent autonomously executes trades by synthesizing technical signals and sentiment-driven insights, aiming to outperform sentiment-agnostic strategies. The data pipeline is demonstrated in Figure \ref{fig:pipeline}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{images/LLM-RL.png}
+  \caption{Data pipeline of the network. News data are first sent to LLM to be processed into sentiment data before being combined with price data.}
+  \label{fig:pipeline}
+\end{figure}
 
 \section{Data Acquisition}
 \label{sec:data}
@@ -24,7 +31,7 @@ The data will cover the period from January 1, 2016, to December 28, 2023, inclu
   ]{data/sample_price.csv}{}{
     \date & \tic & \open & \high & \low & \close & \volume
   }
-  \caption{Sample price data from Yahoo Finance API}
+  \caption{Sample price data from Yahoo Finance API. These price features are common across financial application for their ability to capture important information about a stock.}
   \label{tab:prices}
 \end{table}
 
@@ -52,7 +59,7 @@ For news data, this research will utilize the Financial News and Stock Price Int
       TexRank Sum & \TexRank \\ \hline
       LexRank Sum & \LexRank 
   }
-  \caption{Sample new data from FNSPID}
+  \caption{Sample new data from FNSPID. The news content are processed into 4 different types of summaries making the LLM extraction process very token efficient.}
   \label{tab:news}
 \end{table}
 
@@ -68,7 +75,7 @@ After news data are acquired as outline in the \ref{sec:data}, relevant news dat
     frame=single,
     linewidth=\linewidth
   ]{data/prompt_template.txt}
-  \caption{Prompt template used to process news data into prompts}
+  \caption{Prompt template used to process news data into prompts. The template is designed to encourage the model to output the correct JSON format.}
   \label{fig:prompt}
 \end{figure}
 

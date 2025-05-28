@@ -50,7 +50,7 @@ However, the assumption of perfect and complete state observability, central to 
 \begin{figure}
   \centering
     \includegraphics[width=0.8\textwidth]{images/MDP_POMDP_comparison.png}
-    \caption{Differences between MDP and POMDP.}
+    \caption{Differences between MDP and POMDP. In POMDP, the environment only provide an observation of the true state to the agent.}
     \label{fig:MDP_POMDP}
 \end{figure}
 
@@ -79,7 +79,7 @@ To implement this maximum entropy objective, \gls{SAC} employs a sophisticated a
 \begin{figure}
   \centering
     \includegraphics[width=0.8\textwidth]{images/AC_architecture.png}
-    \caption{Actor-Critic Architecture.}
+    \caption{Actor-Critic Architecture. The critic is responsible for evaluating the value of the chosen action by estimating the value functions.}
     \label{fig:AC}
 \end{figure}
 

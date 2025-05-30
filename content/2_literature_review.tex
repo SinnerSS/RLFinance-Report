@@ -34,7 +34,7 @@ An \gls{MDP} is formally characterized by a tuple \((S, A, P, R, \gamma)\). The 
 
 Complementing the state space is the Action Space \(A\), which defines the set of all possible actions \(a \in A\) that the agent can execute. Actions are the means by which the agent influences the environment, and like states, they can be discrete or continuous. The definition of the action space fundamentally constrains the capabilities of the agent and can significantly impact the complexity of the learning problem.
 
-The dynamics of the environment, specifying how states evolve in response to actions, are captured by the Transition Probability Function \(P\). This function, \(P(s' | s, a)\), dictates the probability of the environment transitioning to a new state \(s'\) given that the agent is in state \(s\) and takes action \(a\). This probabilistic nature accounts for inherent stochasticity in the environment's response. Crucially, this transition function inherently relies on the Markov Property: the next state \(s'\) depends only on the current state \(s\) and the current action \(a\). Mathematically, this Markov property is expressed as: 
+The dynamics of the environment, specifying how states evolve in response to actions, are captured by the Transition Probability Function \(P\). This function, \(P(s' | s, a)\), dictates the probability of the environment transitioning to a new state \(s'\) given that the agent is in state \(s\) and takes action \(a\). This probabilistic nature accounts for inherent stochasticity in the environment's response. Crucially, this transition function inherently relies on the Markov Property: the next state \(s'\) depends only on the current state \(s\) and the current action \(a\). Mathematically, this Markov property is expressed as:
 \[P(s_{t+1}| s_t, a_t, s_{t-1}, a_{t-1}, ..., s_0, a_0) = P(s_{t+1} | s_t, a_t)\]
 
 The guiding signal for the agent's learning process is provided by the Reward Function \(R\). This function, often denoted as \(R(s, a, s')\), specifies the scalar immediate reward (or penalty) the agent receives after taking action \(a\) in state \(s\) and transitioning to state \(s'\). The overarching goal of the agent is to learn a sequence of actions that maximizes the cumulative sum of these rewards over time. This cumulative reward, known as the return, is often defined as:
@@ -42,27 +42,27 @@ The guiding signal for the agent's learning process is provided by the Reward Fu
 where \(\gamma \in [0,1]\) is the discount factor to modulates the importance of future rewards relative to immediate ones, and \(r_t\) is the immediate reward at time step \(t\).
 
 Within this MDP framework, the agent's decision-making mechanism is formalized as a policy \(\pi\):
-\[\pi(a|s) = P(a_t = a | s_t = s)\] 
+\[\pi(a|s) = P(a_t = a | s_t = s)\]
 which maps states to actions (or distributions over actions). The ultimate aim is to discover an optimal policy \(\pi^*\) that maximizes the expected cumulative discounted reward \(\mathbb{E}[G_t | s_t = s]\) for all state \(s\).
 
 However, the assumption of perfect and complete state observability, central to the \gls{MDP} formulation, is often a ideal assumption that does not hold in many complex, real-world scenarios. More frequently, an agent does not have access to the true underlying state of the environment. Instead, it receives observations that are correlated with the true state but may be noisy, incomplete, or ambiguous. This realistic scenario is formally modeled by a \gls{POMDP}, with Figure \ref{fig:MDP_POMDP} illustrating the crucial difference \cite{Blumenthal2024}.
 
 \begin{figure}
-  \centering
-    \includegraphics[width=0.8\textwidth]{images/MDP_POMDP_comparison.png}
-    \caption{Differences between MDP and POMDP. In POMDP, the environment only provide an observation of the true state to the agent.}
-    \label{fig:MDP_POMDP}
+\centering
+\includegraphics[width=0.8\textwidth]{images/MDP_POMDP_comparison.png}
+\caption{Differences between MDP and POMDP. In POMDP, the environment only provide an observation of the true state to the agent.}
+\label{fig:MDP_POMDP}
 \end{figure}
 
 A \gls{POMDP} extends the \gls{MDP} framework by explicitly acknowledging this imperfect perception. It is typically defined by a tuple \((S, A, P, R, \Omega, O, \gamma)\), where \(S\), \(A\), \(P\), \(R\), and \(\gamma\) are similar to their \gls{MDP} counterparts. The new components are the observation space \(\Omega\), a set of all possible observations \(o \in \Omega\) that the agent can receive from the environment, and the Observation Probability Function \(O(o | s', a)\), which defines the probability of the agent receiving observation \(o\) given that the environment has transitioned to the true state \(s'\) after the agent took action \(a\) in the previous (hidden) state.
 
-In a \gls{POMDP}, since the true state \(s\) is not directly known, the agent cannot base its decisions directly on \(s\). Instead, the agent must operate based on the history of its actions and the observations it has received. To make optimal decisions, an agent in a POMDP often needs to maintain a belief state: 
-\[b(s_t) = P(s_t | o_t, a_{t-1}, o_{t-1}, ..., a_0, o_0)\] 
-which is a probability distribution over the set of all possible true states \(S\), representing the belief of the agent about the current true state \(s_t\) given the entire history of past actions and observations up to time \(t\). This belief state can be updated recursively using Bayes' rule: 
-\[b_t(s') \propto  O(o_t | s', a_{t-1}) \Sigma_{s \in S} P(s' | s, a_{t-1}) b_{t-1}(s)\] 
+In a \gls{POMDP}, since the true state \(s\) is not directly known, the agent cannot base its decisions directly on \(s\). Instead, the agent must operate based on the history of its actions and the observations it has received. To make optimal decisions, an agent in a POMDP often needs to maintain a belief state:
+\[b(s_t) = P(s_t | o_t, a_{t-1}, o_{t-1}, ..., a_0, o_0)\]
+which is a probability distribution over the set of all possible true states \(S\), representing the belief of the agent about the current true state \(s_t\) given the entire history of past actions and observations up to time \(t\). This belief state can be updated recursively using Bayes' rule:
+\[b_t(s') \propto  O(o_t | s', a_{t-1}) \Sigma_{s \in S} P(s' | s, a_{t-1}) b_{t-1}(s)\]
 The policy in a \gls{POMDP} thus becomes a mapping from belief states (or, more practically, from histories of observations) to actions: \(\pi(a | b)\) or \(\pi(a | h_t)\) where \(h_t = (o_0, a_0, ..., a_{t-1}, o_t)\) is the observation-action history. Finding an optimal policy in a \gls{POMDP} is significantly more challenging than in an \gls{MDP} because the agent must contend with uncertainty about the true state of the world and potentially infer it from a stream of partial information.
 
-The problem of stock trading, which is the focus of this thesis, serves as an example of a \gls{POMDP}. An \gls{RL} agent attempting to trade stocks does not have access to the complete, true state of the financial market. Factors such as the aggregate sentiment of all market participants, the undisclosed intentions and order books of other traders, unreleased material news, and the true "fair value" of assets remain largely hidden. The agent instead receives observations, such as historical price and volume data, technical indicators, and, in the context of this work, signals derived from \gls{LLM} analyzing news articles, financial reports, and social media. 
+The problem of stock trading, which is the focus of this thesis, serves as an example of a \gls{POMDP}. An \gls{RL} agent attempting to trade stocks does not have access to the complete, true state of the financial market. Factors such as the aggregate sentiment of all market participants, the undisclosed intentions and order books of other traders, unreleased material news, and the true "fair value" of assets remain largely hidden. The agent instead receives observations, such as historical price and volume data, technical indicators, and, in the context of this work, signals derived from \gls{LLM} analyzing news articles, financial reports, and social media.
 
 \section{Soft Actor-Critic}
 \label{sec:sac}
@@ -71,31 +71,31 @@ In \gls{RL} field, \gls{SAC} stands as a state-of-the-art algorithm, particularl
 The inclusion of an entropy term in the objective function profoundly impacts the learning dynamics and the nature of the learned policy. The augmented \gls{SAC} objective function is expressed as:
 \[J(\pi) = \mathbb{E}_{s_t \sim \rho_\pi, a_t \sim \pi(\cdot|s_t)} [R(s_t, a_t) + \alpha H(\pi(\cdot|s_t))]\]
 Here, \(s_t\) are states visited under policy \(\pi\), \(a_t\) are actions sampled from \(\pi(\cdot|s_t)\), \(R(s_t, a_t)\) is the immediate reward, and the entropy of the policy \(\pi\) in state \(s_t\) is:
-\[H(\pi(\cdot|s_t)) = \mathbb{E}_{a_t \sim \pi(\cdot|s_t)}[-log \pi(a_t|s_t)]\] 
+\[H(\pi(\cdot|s_t)) = \mathbb{E}_{a_t \sim \pi(\cdot|s_t)}[-log \pi(a_t|s_t)]\]
 The temperature parameter \(\alpha > 0\), serves as a crucial trade-off coefficient, determining the relative importance of the entropy bonus compared to the extrinsic reward. A higher \(\alpha\) encourages more stochastic, exploratory behavior by pushing the policy towards a more uniform distribution over actions, while a lower \(\alpha\) shifts the focus more towards exploiting known good actions to maximize rewards. This entropy maximization offers several key advantages: it promotes exploration, which is vital in complex environments with sparse rewards or deceptive local optima; it leads to policies that tend to be more robust to perturbations as they are less committed to a single, deterministic path; and it can accelerate learning by preventing premature convergence to suboptimal strategies.
 
 To implement this maximum entropy objective, \gls{SAC} employs a sophisticated architecture, typically realized using neural networks for function approximation, which comprises several primary, interconnected components. Figure \ref{fig:AC} demonstrates the role of the main component actor and critic in \gls{SAC} agent.
 
 \begin{figure}
-  \centering
-    \includegraphics[width=0.8\textwidth]{images/AC_architecture.png}
-    \caption{Actor-Critic Architecture. The critic is responsible for evaluating the value of the chosen action by estimating the value functions.}
-    \label{fig:AC}
+\centering
+\includegraphics[width=0.8\textwidth]{images/AC_architecture.png}
+\caption{Actor-Critic Architecture. The critic is responsible for evaluating the value of the chosen action by estimating the value functions.}
+\label{fig:AC}
 \end{figure}
 
-First is the Actor, or Policy Network, denoted as \(\pi_\phi(a|s)\) and parameterized by \(\phi\). This network is responsible for learning the agent's behavior. It takes the current state \(s\) as input and outputs the parameters of a probability distribution over the action space. For continuous actions, this is commonly a Gaussian distribution, where the network outputs the mean \(\mu_\phi(s)\) and standard deviation \(\sigma_\phi(s)\). Actions are then stochastically sampled from this distribution during interaction with the environment. The  learning objective of the actor is to choose actions that not only lead to high expected future rewards (as estimated by the critic) but also maintain high policy entropy. To enable gradient-based optimization through the stochastic sampling process, especially in continuous action spaces, \gls{SAC} utilizes the reparameterization trick. This involves expressing the sampled action \(a_t\) as a deterministic function of the policy parameters and an independent noise variable \(\epsilon\): 
+First is the Actor, or Policy Network, denoted as \(\pi_\phi(a|s)\) and parameterized by \(\phi\). This network is responsible for learning the agent's behavior. It takes the current state \(s\) as input and outputs the parameters of a probability distribution over the action space. For continuous actions, this is commonly a Gaussian distribution, where the network outputs the mean \(\mu_\phi(s)\) and standard deviation \(\sigma_\phi(s)\). Actions are then stochastically sampled from this distribution during interaction with the environment. The  learning objective of the actor is to choose actions that not only lead to high expected future rewards (as estimated by the critic) but also maintain high policy entropy. To enable gradient-based optimization through the stochastic sampling process, especially in continuous action spaces, \gls{SAC} utilizes the reparameterization trick. This involves expressing the sampled action \(a_t\) as a deterministic function of the policy parameters and an independent noise variable \(\epsilon\):
 \[a_t = \mu_\phi(s_t) + \sigma_\phi(s_t) \cdot \epsilon, \quad \epsilon \sim \mathcal{N}(0,I)\]
 
 Second, the Critic component in \gls{SAC} learns one or, more commonly, two Soft Q-Value Networks, \(Q_\theta(s, a)\), parameterized by \(\theta\). These networks learn to estimate the expected sum of future rewards and future entropy bonuses, if the agent starts in state \(s\), takes action \(a\), and subsequently follows the current policy \(\pi\) thereafter. This is known as the soft Q-value. The learning of these Q-functions is guided by a modified Bellman equation that incorporates the entropy term. The target for the soft Q-function is:
-\[y(r, s') = r + \gamma(\mathbb{E}_{a' \sim \pi(\cdot|s')} [Q_{target}(s', a')] - \alpha \log \pi(a'|s'))\] 
-The Q-networks are then trained by minimizing the soft Bellman residual, typically the squared error: 
+\[y(r, s') = r + \gamma(\mathbb{E}_{a' \sim \pi(\cdot|s')} [Q_{target}(s', a')] - \alpha \log \pi(a'|s'))\]
+The Q-networks are then trained by minimizing the soft Bellman residual, typically the squared error:
 \[L_Q(\theta) = \mathbb{E}_{(s,a,r,s') \sim \mathcal{D}} [(Q_\theta(s,a) - y(r,s'))^2]\]
 where \(\mathcal{D}\) is the replay buffer. To combat the overestimation bias common in actor-critic methods, \gls{SAC} often implements the Clipped Double Q-learning technique. This involves learning two independent Q-networks (\(Q_{\theta_1}\) and \(Q_{\theta_2}\)) and using the minimum of their predictions when constructing the target value in the Bellman updates:
 \[y(r, s') = r + \gamma(\mathbb{E}_{a' \sim \pi(\cdot|s')} [\min(Q_{target,1}(s', a'), Q_{target,2}(s', a'))] - \alpha \log \pi(a'|s'))\]
 This conservative approach helps to mitigate positive bias and generally leads to more stable and reliable value estimates.
 
-Third, to further enhance stability in the learning of the Q-functions, \gls{SAC} utilizes Target Q-Networks (\(Q_{\theta'_1}\) and \(Q_{\theta'_2}\), or \(Q_{target,1}\) and \(Q_{target,2}\) in the equation above) for the critic. These are separate networks whose parameters are periodically or slowly updated copies of the parameter of the main Q-networks. A common update rule is Polyak averaging: 
-\[\theta'_i \leftarrow \tau\theta_i + (1-\tau)\theta'_i, i=1,2\] 
+Third, to further enhance stability in the learning of the Q-functions, \gls{SAC} utilizes Target Q-Networks (\(Q_{\theta'_1}\) and \(Q_{\theta'_2}\), or \(Q_{target,1}\) and \(Q_{target,2}\) in the equation above) for the critic. These are separate networks whose parameters are periodically or slowly updated copies of the parameter of the main Q-networks. A common update rule is Polyak averaging:
+\[\theta'_i \leftarrow \tau\theta_i + (1-\tau)\theta'_i, i=1,2\]
 where \(\tau\) is a small constant. By using these slowly changing target networks to calculate the target values in the Bellman equation, the learning process is less prone to oscillations and divergence.
 
 Fourth, a distinctive feature of many \gls{SAC} implementations is the Automated Temperature Parameter \(\alpha\) Tuning. While \(\alpha\) can be set as a fixed hyperparameter, \gls{SAC} often benefits from making \(\alpha\) a learnable parameter. This allows the algorithm to dynamically adjust the emphasis on entropy throughout the learning process, adapting the exploration-exploitation balance. The objective for learning \(\alpha\) is typically to maintain the policy's entropy at a predefined target entropy level \(\mathcal{H}_{target}\) (often set heuristically, e.g., \(-\text{dim}(\mathcal{A})\), where \(\text{dim}(\mathcal{A})\) is the action space dimensionality). This is achieved by performing gradient descent on \(\alpha\) to minimize the objective:

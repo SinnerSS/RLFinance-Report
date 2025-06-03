@@ -5,7 +5,6 @@
 
 \begin{document}
 
-\selectlanguage{vietnamese}
 \input{content/0_1_cover.tex}
 \pagestyle{empty}
 
@@ -39,8 +38,10 @@
 \listoftables}
 
 \glsaddall 
+\renewcommand*{\acronymname}{LIST OF ABBREVIATIONS}
+\renewcommand*{\entryname}{Abbreviation}
+\renewcommand*{\descriptionname}{Definition}
 \printnoidxglossaries
-
 
 \newpage
 \pagenumbering{arabic}
@@ -73,5 +74,5 @@
 \label{chap:conclusion}
 \input{content/5_conclusions.tex}
 
-\printbibliography
+\printbibliography[title=REFERENCES]
 \end{document}

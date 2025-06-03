@@ -16,7 +16,7 @@ The proposed network operates in five key stages, beginning with data acquisitio
 This section details the processes involved in gathering and preparing the necessary data, which includes historical financial market data for a defined set of stocks and a specific financial news dataset. The quality and structure of this input data are foundational to the subsequent stages of sentiment analysis, feature engineering, and \gls{RL} agent training.
 
 \subsection{Financial Market Data}
-Historical \gls{OHLCV} data for a curated list of 100 predefined stocks (stocks in the Nasdaq-100 on September 13, 2023) will be acquired. The primary source for this financial data will be the Yahoo Finance API. 
+Historical \gls{OHLCV} data for a curated list of 100 predefined stocks (stocks in the Nasdaq-100 on September 13, 2023) will be acquired. The primary source for this financial data will be the Yahoo Finance API.
 
 The data will cover the period from January 1, 2016, to December 28, 2023, inclusive. Data will be collected at a daily frequency. The complete dataset will be chronologically divided into training, validation, and testing sets, spanning 5 years, 1 year, and 1 year, respectively. Table \ref{tab:prices} provide a few samples of price data collected.
 
@@ -45,19 +45,21 @@ For news data, this research will utilize the Financial News and Stock Price Int
     respect dollar,
     head to column names,
     separator=semicolon,
-    before reading=\begin{tabular}{|l|p{.7\linewidth}|}\hline,
-    after reading=\end{tabular},
+    before reading=
+    \begin{tabular}{|l|p{.7\linewidth}|}\hline,
+      after reading=
+    \end{tabular},
     late after line=\\\hline
   ]{data/sample_news.csv}{}{
-      Date        & \Date \\ \hline
-      Symbol      & \Symbol \\ \hline
-      Headline    & \Headline \\ \hline
-      Text        & \Text \\ \hline
-      URL         & \URL \\ \hline
-      LSA Sum     & \LSA \\ \hline
-      Luhn Sum    & \Luhn \\ \hline
-      TexRank Sum & \TexRank \\ \hline
-      LexRank Sum & \LexRank 
+    Date        & \Date \\ \hline
+    Symbol      & \Symbol \\ \hline
+    Headline    & \Headline \\ \hline
+    Text        & \Text \\ \hline
+    URL         & \URL \\ \hline
+    LSA Sum     & \LSA \\ \hline
+    Luhn Sum    & \Luhn \\ \hline
+    TexRank Sum & \TexRank \\ \hline
+    LexRank Sum & \LexRank
   }
   \caption{Sample new data from FNSPID. The news content are processed into 4 different types of summaries making the LLM extraction process very token efficient.}
   \label{tab:news}
@@ -153,19 +155,19 @@ The Directional Movement Index (DMI) is a trend‐strength indicator that compar
 For each period \(t\), compute the upward and downward price movements:
 \[\mathrm{UM}_t = H_t - H_{t-1}, \quad \mathrm{DM}_t = L_{t-1} - L_t,\]
 \[
-\begin{aligned}
-\mathrm{DM}^+_t &= 
-  \begin{cases}
-    \mathrm{UM}_t, & \mathrm{UM}_t > \mathrm{DM}_t \text{ and } \mathrm{UM}_t > 0,\\
-    0, & \text{otherwise},
-  \end{cases}
-  \\
-\mathrm{DM}^-_t &= 
-  \begin{cases}
-    \mathrm{DM}_t, & \mathrm{DM}_t > \mathrm{UM}_t \text{ and } \mathrm{DM}_t > 0,\\
-    0, & \text{otherwise}
-  \end{cases}
-\end{aligned}
+  \begin{aligned}
+    \mathrm{DM}^+_t &=
+    \begin{cases}
+      \mathrm{UM}_t, & \mathrm{UM}_t > \mathrm{DM}_t \text{ and } \mathrm{UM}_t > 0,\\
+      0, & \text{otherwise},
+    \end{cases}
+    \\
+    \mathrm{DM}^-_t &=
+    \begin{cases}
+      \mathrm{DM}_t, & \mathrm{DM}_t > \mathrm{UM}_t \text{ and } \mathrm{DM}_t > 0,\\
+      0, & \text{otherwise}
+    \end{cases}
+  \end{aligned}
 \]
 Define the true range:
 \[\mathrm{TR}_t = \max(H_t - L_t, |H_t - C_{t-1}|, |L_t - C_{t-1}|)\]
@@ -181,9 +183,9 @@ Finally, the \gls{ADX} is the \(n\)-period simple moving average of \(\mathrm{DX
 Practically, rising \gls{ADX} values indicate strengthening trend momentum (regardless of direction), while falling values signal weakening trends. Traders use \gls{DMI} and \gls{ADX} to confirm trend presence, gauge its strength, and generate trade signals when directional indicators cross.
 
 \section{Agent Training}
-The trading system is modeled as a \gls{POMDP} operating on a daily time step. At each step \(t\), the agent observes a feature vector composed of the following information: \gls{OHLCV} data, technical indicators, and sentiment signals. 
+The trading system is modeled as a \gls{POMDP} operating on a daily time step. At each step \(t\), the agent observes a feature vector composed of the following information: \gls{OHLCV} data, technical indicators, and sentiment signals.
 
-To prepare each feature series for the agent, we first convert all price columns  into log returns by taking the natural logarithm of today price over yesterday. Trading volume is smoothed by applying a logarithmic transform and standardized using a rolling mean and standard deviation over a fixed window, shifted to avoid lookahead. Oscillators like \gls{MACD} and \gls{CCI} undergo the same rolling z-score standardization. \gls{BB} are summarized into a percentage metric by comparing the current price to its upper and lower bands. Short and long term moving averages are expressed as ratios of the current price to their respective averages, minus one. \gls{RSI} and \gls{ADX}, which inherently range from \(0\) to \(100\), are simply rescaled to a \(0\)–\(1\) interval. Finally, all news sentiment metrics, including mean sentiment, news counts, and longer term rolling averages, are normalized via the same rolling z-score procedure. 
+To prepare each feature series for the agent, we first convert all price columns  into log returns by taking the natural logarithm of today price over yesterday. Trading volume is smoothed by applying a logarithmic transform and standardized using a rolling mean and standard deviation over a fixed window, shifted to avoid lookahead. Oscillators like \gls{MACD} and \gls{CCI} undergo the same rolling z-score standardization. \gls{BB} are summarized into a percentage metric by comparing the current price to its upper and lower bands. Short and long term moving averages are expressed as ratios of the current price to their respective averages, minus one. \gls{RSI} and \gls{ADX}, which inherently range from \(0\) to \(100\), are simply rescaled to a \(0\)–\(1\) interval. Finally, all news sentiment metrics, including mean sentiment, news counts, and longer term rolling averages, are normalized via the same rolling z-score procedure.
 
 At each daily time step \(t\), the agent receives a shaped reward \(R_t\) that combines the portfolio’s log return with a sentiment-based potential shaping term. Let \(W_t = (w_{1,t},\dots,w_{N,t})^\top\) denote the portfolio weights at the beginning of day \(t\), and let \(P_{j,t}\) be the closing price of asset \(j\) on day \(t\). We also extract a sentiment score \(\mathrm{sent}_j(s_t)\) for each asset \(j\) at state \(s_t\). The total reward is:
 \[R_t = R_t^{\mathrm{price}} + R_t^{\mathrm{sent}}\]

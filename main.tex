@@ -21,23 +21,23 @@
 \pagenumbering{gobble}
 
 \addtocontents{toc}{\protect\thispagestyle{empty}}
-\tableofcontents 
+\tableofcontents
 \thispagestyle{empty}
 \cleardoublepage
 
 \pagenumbering{roman}
 \renewcommand{\listfigurename}{LIST OF FIGURES}
 {\let\oldnumberline\numberline
-\renewcommand{\numberline}{Figure~\oldnumberline}
-\listoffigures} 
+  \renewcommand{\numberline}{Figure~\oldnumberline}
+\listoffigures}
 \newpage
 
 \renewcommand{\listtablename}{LIST OF TABLES}
 {\let\oldnumberline\numberline
-\renewcommand{\numberline}{Table~\oldnumberline}
+  \renewcommand{\numberline}{Table~\oldnumberline}
 \listoftables}
 
-\glsaddall 
+\glsaddall
 \renewcommand*{\acronymname}{LIST OF ABBREVIATIONS}
 \renewcommand*{\entryname}{Abbreviation}
 \renewcommand*{\descriptionname}{Definition}

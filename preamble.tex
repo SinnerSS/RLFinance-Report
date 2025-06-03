@@ -65,7 +65,6 @@
 \usepackage[backend=biber,style=ieee,sorting=ynt]{biblatex}
 \addbibresource{references.bib}
 
-
 \def \TITLE{GRADUATION THESIS}
 \def \AUTHOR{Nguyễn Trí Nghĩa}
 
@@ -90,14 +89,14 @@
 \titlespacing{\subsection}{30pt}{\parskip}{0.5\parskip}
 
 \renewcommand\thesubsubsection{\alph{subsubsection}}
-\titleformat{\subsubsection}{\bfseries}{\alph{subsubsection},\ }{0pt}{} 
+\titleformat{\subsubsection}{\bfseries}{\alph{subsubsection},\ }{0pt}{}
 \titlespacing{\subsubsection}{50pt}{\parskip}{0.5\parskip}
 
 \usepackage{hyperref}
 \hypersetup{pdfborder = {0 0 0}}
 \hypersetup{pdftitle={\TITLE},
-	pdfauthor={\AUTHOR}}
-	
+pdfauthor={\AUTHOR}}
+
 \usepackage[all]{hypcap}
 
 \graphicspath{{figures/}{../figures/}}
@@ -118,26 +117,25 @@
 
 \renewcommand*\contentsname{TABLE OF CONTENTS}
 \titlecontents{chapter}
-    [0.0cm]
-    {\bfseries\vspace{0.3cm}}
-    {{\bfseries{\scshape} CHAPTER \thecontentslabel.\ }}
-    {}
-    {\titlerule*[0.3pc]{.}\contentspage}
-    
-\titlecontents{section}
-    [0.0cm]
-    {\vspace{0.3cm}}
-    {\thecontentslabel \ }
-    {}
-    {\titlerule*[0.3pc]{.}\contentspage}
-    
-\titlecontents{subsection}
-    [1.0cm]
-    {\vspace{0.3cm}}
-    {\thecontentslabel \ }
-    {}
-    {\titlerule*[0.3pc]{.}\contentspage}
+[0.0cm]
+{\bfseries\vspace{0.3cm}}
+{{\bfseries{\scshape} CHAPTER \thecontentslabel.\ }}
+{}
+{\titlerule*[0.3pc]{.}\contentspage}
 
+\titlecontents{section}
+[0.0cm]
+{\vspace{0.3cm}}
+{\thecontentslabel \ }
+{}
+{\titlerule*[0.3pc]{.}\contentspage}
+
+\titlecontents{subsection}
+[1.0cm]
+{\vspace{0.3cm}}
+{\thecontentslabel \ }
+{}
+{\titlerule*[0.3pc]{.}\contentspage}
 
 \renewcommand{\figurename}{Figure}
 \renewcommand{\tablename}{Table}

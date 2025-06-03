@@ -34,9 +34,9 @@ Figure \ref{fig:portfolio_value} shows the portfolio value of all baselines and 
 
 \begin{figure}
   \centering
-    \includegraphics[width=0.8\textwidth]{images/CPV_plot.png}
-    \caption{Cumulative Portfolio Value of the strategies and RL model. Our LLM-SAC model performance was able to surpass both non-LLM RL agents and strategies}
-    \label{fig:portfolio_value}
+  \includegraphics[width=0.8\textwidth]{images/CPV_plot.png}
+  \caption{Cumulative Portfolio Value of the strategies and RL model. Our LLM-SAC model performance was able to surpass both non-LLM RL agents and strategies}
+  \label{fig:portfolio_value}
 \end{figure}
 
 \csvreader[
@@ -54,14 +54,14 @@ Figure \ref{fig:portfolio_value} shows the portfolio value of all baselines and 
 
 Turning to the \gls{RL} agents, the \gls{PPO} agent achieved a cumulative return of \(16.99\%\). The standard \gls{SAC} agent, without LLM augmentation, performed notably better, securing a cumulative return of \(24.90\%\). Both \gls{RL} agents outperformed most traditional strategies, highlighting the general advantage of adaptive learning approaches in this context. The LLM-SAC agent outperform both vanilla agent with \(11.83\%\) higher \gls{CPV} than vanilla \gls{SAC} agent.
 
-Furthermore, Table \ref{tab:performance} measures all methods with a more comprehensive set of financial metrics. The proposed LLM-SAC agent set a new performance benchmark among all tested methods. It achieved the highest an return of \(36.73\%\) over the test period, translating to an impressive annualized return of \(11.92\%\). This superior performance is also reflected in its Sharpe Ratio of \(0.81\), which was the highest recorded, indicating better risk-adjusted returns compared to all other strategies. 
+Furthermore, Table \ref{tab:performance} measures all methods with a more comprehensive set of financial metrics. The proposed LLM-SAC agent set a new performance benchmark among all tested methods. It achieved the highest an return of \(36.73\%\) over the test period, translating to an impressive annualized return of \(11.92\%\). This superior performance is also reflected in its Sharpe Ratio of \(0.81\), which was the highest recorded, indicating better risk-adjusted returns compared to all other strategies.
 
 \begin{table}
   \centering
   \begin{tabular}{lrrrr}
     \toprule
-    Strategy & CPV (\%) & CAGR (\%) 
-             & SR       & MDD (\%) \\
+    Strategy & CPV (\%) & CAGR (\%)
+    & SR       & MDD (\%) \\
     \midrule
     \csvreader[
       head to column names,
@@ -82,9 +82,9 @@ In terms of risk, the \gls{MDD} for the LLM-SAC agent was \(-21.47\%\). While th
 
 \begin{figure}
   \centering
-    \includegraphics[width=0.8\textwidth]{images/underwater_plot.png}
-    \caption{Underwater plot of LLM-SAC agent. During the beginning period, the agent suffers from significant drawdown corresponding to a bear market.}
-    \label{fig:underwater_plot}
+  \includegraphics[width=0.8\textwidth]{images/underwater_plot.png}
+  \caption{Underwater plot of LLM-SAC agent. During the beginning period, the agent suffers from significant drawdown corresponding to a bear market.}
+  \label{fig:underwater_plot}
 \end{figure}
 
 Overall, these experimental findings strongly validate the hypothesis that enriching a \gls{RL} agent with \gls{LLM}‑derived sentiment signals significantly elevates trading performance. The LLM‑SAC agent not only outpaces its non‑augmented counterpart by a wide margin but also surpasses a diverse array of classic trading strategies in both absolute and risk‑adjusted terms.

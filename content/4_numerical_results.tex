@@ -21,7 +21,7 @@ where \(R_p\) is the average return of the portfolio, \(R_f\) is the risk-free r
 \gls{MDD} is typically expressed as a negative percentage.
 
 \section{Simulation Method}
-The simulation for evaluating the \gls{LLM}-augmented \gls{RL} trading agent and the baseline strategies will be conducted on historical data. The testing period will cover the final year of the collected dataset, specifically from December 29, 2022, to December 28, 2023. This out-of-sample period ensures that the evaluation is performed on data not seen by any model during its training or validation phases. The investment universe will consist of the 100 stocks from the Nasdaq-100 index, as defined on September 13, 2023, providing a diverse and representative set of large-cap technology and growth equities. All strategies will start with the same initial portfolio value and operate under identical transaction cost assumptions to ensure a fair comparison.
+The simulation for evaluating the \gls{LLM}-augmented \gls{RL} trading agent and the baseline strategies will be conducted on historical data. The testing period will cover the final year of the collected dataset, specifically from December 29, 2022, to December 28, 2023. This out-of-sample period ensures that the evaluation is performed on data not seen by any model during its training or validation phases. The investment universe will consist of the 100 stocks from the Nasdaq-100 index, as defined on September 13, 2023, providing a diverse and representative set of large-cap technology and growth equities. All strategies will start with the same initial portfolio value to ensure a fair comparison.
 
 The choice of baseline strategies is critical for a comprehensive assessment. The \gls{BaH} strategy serves as the most fundamental benchmark, representing a passive investment approach where an equally weighted portfolio of all available stocks is bought at the beginning of the test period and held until the end. This strategy provides a baseline for market performance. \gls{UP} represent a class of non-parametric sequential investment algorithms that are theoretically proven to achieve the same asymptotic growth rate as the best constantly rebalanced portfolio chosen in hindsight. Specific variants of \gls{UP}, namely \gls{CORN} and \gls{ANTICOR} strategies, are included because they exploit different statistical properties of asset returns. \gls{CORN} aims to capitalize on consistent positive or negative correlations between assets, while \gls{ANTICOR} seeks to profit from mean-reverting patterns or anti-correlated movements. These online learning algorithms provide robust benchmarks from the field of computational finance.
 
@@ -58,24 +58,22 @@ Furthermore, Table \ref{tab:performance} measures all methods with a more compre
 
 \begin{table}
   \centering
-  \resizebox{\textwidth}{!}{
-    \begin{tabular}{lrrrr}
-      \toprule
-      Strategy & Cumulative Return (\%) & Annualized Return (\%) 
-               & Sharpe Ratio        & Max Drawdown (\%) \\
-      \midrule
-      \csvreader[
-        head to column names,
-        late after line=\\\hline,
-      ]{data/evaluation_metrics.csv}{}{
-        \strategy &
-        \ifdim\cumulative pt=\maxCumul   \textbf{\cumulative}   \else \cumulative   \fi &
-        \ifdim\annualized pt=\maxAnn     \textbf{\annualized}   \else \annualized \fi &
-        \ifdim\sharpe pt=\maxSharpe      \textbf{\sharpe}       \else \sharpe     \fi &
-        \ifdim\mdd pt=\maxMDD            \textbf{\mdd}          \else \mdd        \fi
-      }
-    \end{tabular}
-  }
+  \begin{tabular}{lrrrr}
+    \toprule
+    Strategy & CPV (\%) & CAGR (\%) 
+             & SR       & MDD (\%) \\
+    \midrule
+    \csvreader[
+      head to column names,
+      late after line=\\\hline,
+    ]{data/evaluation_metrics.csv}{}{
+      \strategy &
+      \ifdim\cumulative pt=\maxCumul   \textbf{\cumulative}   \else \cumulative   \fi &
+      \ifdim\annualized pt=\maxAnn     \textbf{\annualized}   \else \annualized \fi &
+      \ifdim\sharpe pt=\maxSharpe      \textbf{\sharpe}       \else \sharpe     \fi &
+      \ifdim\mdd pt=\maxMDD            \textbf{\mdd}          \else \mdd        \fi
+    }
+  \end{tabular}
   \caption{Performance of different trading methods. The LLM-SAC agent is superior in every metrics except MDD.}
   \label{tab:performance}
 \end{table}

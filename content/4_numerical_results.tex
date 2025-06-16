@@ -30,7 +30,7 @@ Crucially, the \gls{LLM}-augmented \gls{RL} agent's performance will also be com
 All models are trained using an NVIDIA RTX 3060 GPU with an Intel Core i7-12700. The main language of the codebase is Python with custom implementation for non-\gls{RL} strategies and with stable-baselines3 library for training of \gls{RL} models.
 
 \section{Experimental Result}
-Figure \ref{fig:portfolio_value} shows the portfolio value of all baselines and our method during the test period. Among the traditional portfolio allocation techniques, the \gls{UP} methodology stood out by delivering cumulative gains of \(15.16\%\). The \gls{BaH} and \gls{ANTICOR} strategies yielded marginal returns around \(4\)-\(5\%\) for the year. The CORN approach proved the least effective, incurring a net loss of \(2.75\%\). When compared with these benchmarks, the LLM‑SAC agent’s performance demonstrates a marked improvement in absolute returns, higher then the best traditional method by \(21.57\%\).
+Figure \ref{fig:portfolio_value} shows the portfolio value of all baselines and our method during the test period. Among the traditional portfolio allocation techniques, the \gls{UP} methodology stood out by delivering cumulative gains of \(15.16\%\). The \gls{BaH} and \gls{ANTICOR} strategies yielded marginal returns around \(4\)-\(5\%\) for the year. The CORN approach proved the least effective, incurring a net loss of \(2.75\%\). When compared with these benchmarks, the LLM‑SAC agent’s performance demonstrates a marked improvement in absolute returns, higher than the best traditional method by \(21.57\%\).
 
 \begin{figure}
   \centering
@@ -54,7 +54,7 @@ Figure \ref{fig:portfolio_value} shows the portfolio value of all baselines and 
 
 Turning to the \gls{RL} agents, the \gls{PPO} agent achieved a cumulative return of \(16.99\%\). The standard \gls{SAC} agent, without LLM augmentation, performed notably better, securing a cumulative return of \(24.90\%\). Both \gls{RL} agents outperformed most traditional strategies, highlighting the general advantage of adaptive learning approaches in this context. The LLM-SAC agent outperform both vanilla agent with \(11.83\%\) higher \gls{CPV} than vanilla \gls{SAC} agent.
 
-Furthermore, Table \ref{tab:performance} measures all methods with a more comprehensive set of financial metrics. The proposed LLM-SAC agent set a new performance benchmark among all tested methods. It achieved the highest an return of \(36.73\%\) over the test period, translating to an impressive annualized return of \(11.92\%\). This superior performance is also reflected in its Sharpe Ratio of \(0.81\), which was the highest recorded, indicating better risk-adjusted returns compared to all other strategies.
+Furthermore, Table \ref{tab:performance} measures all methods with a more comprehensive set of financial metrics. The proposed LLM-SAC agent set a new performance benchmark among all tested methods. It achieved the highest a return of \(36.73\%\) over the test period, translating to an impressive annualized return of \(11.92\%\). This superior performance is also reflected in its Sharpe Ratio of \(0.81\), which was the highest recorded, indicating better risk-adjusted returns compared to all other strategies.
 
 \begin{table}
   \centering

@@ -55,10 +55,10 @@ which maps states to actions (or distributions over actions). The ultimate aim i
 However, the assumption of perfect and complete state observability, central to the \gls{MDP} formulation, is often an ideal assumption that does not hold in many complex, real-world scenarios. More frequently, an agent does not have access to the true underlying state of the environment. Instead, it receives observations that are correlated with the true state but may be noisy, incomplete, or ambiguous. This realistic scenario is formally modeled by a \gls{POMDP}, with Figure \ref{fig:MDP_POMDP} illustrating the crucial difference \cite{Blumenthal2024}.
 
 \begin{figure}
-\centering
-\includegraphics[width=0.8\textwidth]{images/MDP_POMDP_comparison.png}
-\caption{Differences between MDP and POMDP. In POMDP, the environment only provide an observation of the true state to the agent.}
-\label{fig:MDP_POMDP}
+  \centering
+  \includegraphics[width=0.8\textwidth]{images/MDP_POMDP_comparison.png}
+  \caption{Differences between MDP and POMDP. In POMDP, the environment only provide an observation of the true state to the agent.}
+  \label{fig:MDP_POMDP}
 \end{figure}
 
 A \gls{POMDP} extends the \gls{MDP} framework by explicitly acknowledging this imperfect perception. It is typically defined by a tuple \((S, A, P, R, \Omega, O, \gamma)\), where \(S\), \(A\), \(P\), \(R\), and \(\gamma\) are similar to their \gls{MDP} counterparts. The new components are the observation space \(\Omega\), a set of all possible observations \(o \in \Omega\) that the agent can receive from the environment, and the Observation Probability Function \(O(o | s', a)\), which defines the probability of the agent receiving observation \(o\) given that the environment has transitioned to the true state \(s'\) after the agent took action \(a\) in the previous (hidden) state.
@@ -84,10 +84,10 @@ The temperature parameter \(\alpha > 0\), serves as a crucial trade-off coeffici
 To implement this maximum entropy objective, \gls{SAC} employs a sophisticated architecture, typically realized using neural networks for function approximation, which comprises several primary, interconnected components. Figure \ref{fig:AC} demonstrates the role of the main component actor and critic in \gls{SAC} agent.
 
 \begin{figure}
-\centering
-\includegraphics[width=0.8\textwidth]{images/AC_architecture.png}
-\caption{Actor-Critic Architecture. The critic is responsible for evaluating the value of the chosen action by estimating the value functions.}
-\label{fig:AC}
+  \centering
+  \includegraphics[width=0.8\textwidth]{images/AC_architecture.png}
+  \caption{Actor-Critic Architecture. The critic is responsible for evaluating the value of the chosen action by estimating the value functions.}
+  \label{fig:AC}
 \end{figure}
 
 First is the Actor, or Policy Network, denoted as \(\pi_\phi(a|s)\) and parameterized by \(\phi\). This network is responsible for learning the agent's behavior. It takes the current state \(s\) as input and outputs the parameters of a probability distribution over the action space. For continuous actions, this is commonly a Gaussian distribution, where the network outputs the mean \(\mu_\phi(s)\) and standard deviation \(\sigma_\phi(s)\). Actions are then stochastically sampled from this distribution during interaction with the environment. The  learning objective of the actor is to choose actions that not only lead to high expected future rewards (as estimated by the critic) but also maintain high policy entropy. To enable gradient-based optimization through the stochastic sampling process, especially in continuous action spaces, \gls{SAC} utilizes the reparameterization trick. This involves expressing the sampled action \(a_t\) as a deterministic function of the policy parameters and an independent noise variable \(\epsilon\):
